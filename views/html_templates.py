@@ -167,10 +167,15 @@ HOME = """
 </section>
 
 <section id="result">
-  <img id="preview" alt="Your photo">
   <div>
-    <h3 id="resultTitle" style="margin-top:0"></h3>
+    <h3 id="original_photo" style="margin-top:0; text-align:center">Original photo</h3>
     <p id="resultText" style="color:#4b5563;line-height:1.6"></p>
+    <img id="preview" alt="Your photo">
+  </div>
+  <div style="width:240px;">
+    <h3 id="resultTitle" style="margin-top:0; text-align:center"></h3>
+    <p id="resultText" style="color:#4b5563;line-height:1.6"></p>
+    <img id="detected_hinge" alt="Result"></img>
   </div>
 </section>
 
@@ -231,11 +236,14 @@ HOME = """
     const fd = new FormData();
     fd.append("photo", file);
     try {
-      const res = await fetch("/api/analyze", { method: "POST", body: fd });
-      const data = await res.json();
-      title.textContent = data.title || "Error";
+    
+      const data = await (await fetch("/api/analyze", {method: "POST", body: fd})).json();
+      document.getElementById("detected_hinge").src = data.image;
+  
+      title.textContent = data.title || "Detected hinge";
       text.textContent = data.message || data.error;
     } catch (e) {
+      console.log(e);
       title.textContent = "Error";
       text.textContent = "Could not reach the server.";
     }

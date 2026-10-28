@@ -1,3 +1,7 @@
+import base64
+from werkzeug.datastructures import FileStorage
+
+from ai_models.meta.sam import Sam
 from views.icons import ICONS
 from views.html_templates import BASE, HOME
 from flask import Flask, jsonify, render_template_string, request
@@ -41,12 +45,20 @@ def settings():
 
 @app.route("/api/analyze", methods=["POST"])
 def analyze():
-    photo = request.files.get("photo")
+    photo: FileStorage | None = request.files.get("photo")
     if not photo or not photo.filename:
         return jsonify(error="No file uploaded."), 400
     ext = photo.filename.rsplit(".", 1)[-1].lower()
     if ext not in ALLOWED:
         return jsonify(error="Only JPG and PNG files are supported."), 400
+
+    result = Sam(photo).ask("Broken hinge")
+
+    return jsonify(
+        image="data:image/png;base64," + base64.b64encode(result.image_png).decode(),
+        objects=[{"id": o.object_id, "box": o.box, "pixels": int(o.mask.sum())}
+                 for o in result.objects],
+    )
 
     # TODO: send photo.read() to AI model and return its diagnosis + steps.
     return jsonify(
