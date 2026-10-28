@@ -7,7 +7,6 @@ from dataclasses import dataclass
 import numpy as np
 from meta_sam_parser import SegmentationMask, decode_mask_to_raster
 from PIL import Image, ImageDraw, ImageOps
-from werkzeug.datastructures import FileStorage
 import requests
 from werkzeug.datastructures import FileStorage
 
@@ -15,7 +14,6 @@ from ai_models.meta.meta_model import MetaModel
 
 from dotenv import load_dotenv
 
-# This automatically injects .env variables into os.environ
 load_dotenv()
 
 api_key = os.environ.get("MODEL_API_KEY")
